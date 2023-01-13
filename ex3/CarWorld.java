@@ -7,7 +7,6 @@ class CarWorld extends JPanel {
     Image bridge;
     Image redCar;
     Image blueCar;
-    Semaphore sem = new Semaphore(1, true);
     TrafficController controller;
 
     ArrayList<Car> blueCars = new ArrayList<Car>();
@@ -33,8 +32,8 @@ class CarWorld extends JPanel {
             System.out.println("Couldn't load one of the images");
         }
 
-	redCars.add(new Car(Car.REDCAR,null,redCar,null,sem));
-	blueCars.add(new Car(Car.BLUECAR,null,blueCar,null,sem));
+	redCars.add(new Car(Car.REDCAR,null,redCar,null));
+	blueCars.add(new Car(Car.BLUECAR,null,blueCar,null));
         setPreferredSize(new Dimension(bridge.getWidth(null),bridge.getHeight(null)));
     }
 
@@ -50,10 +49,10 @@ class CarWorld extends JPanel {
 		public void run() {
 		    Car c;
 		    if (cartype==Car.REDCAR) {
-			c = new Car(cartype,redCars.get(redCars.size()-1),redCar,controller, sem);
+			c = new Car(cartype,redCars.get(redCars.size()-1),redCar,controller);
 			redCars.add(c);
 		    } else {
-			c = new Car(cartype,blueCars.get(blueCars.size()-1),blueCar,controller, sem);
+			c = new Car(cartype,blueCars.get(blueCars.size()-1),blueCar,controller);
 			blueCars.add(c);
 		    }
 		    new Thread(c).start();
