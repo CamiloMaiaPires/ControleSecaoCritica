@@ -5,7 +5,6 @@ public class Car implements Runnable{
 
     public static final int REDCAR  = 0;
     public static final int BLUECAR = 1;
-    private Semaphore sem;
     private final static int bridgeY   = 95;
     private final static int bridgeXLeft = 210;
     private final static int bridgeXLeft2 = 290;
@@ -24,8 +23,8 @@ public class Car implements Runnable{
     Image image;
     TrafficController controller;
 
-    public Car(int cartype,Car inFront, Image image, TrafficController controller, Semaphore sem) {
-    this.sem = sem;
+    public Car(int cartype,Car inFront, Image image, TrafficController controller) {
+
 	this.cartype = cartype;
 	this.inFront = inFront;
         this.image = image;
@@ -39,37 +38,28 @@ public class Car implements Runnable{
     
 
     public synchronized void move() {
-    	notifyAll();
 	int xposOld =  xpos;
 	if (cartype==REDCAR) {
             if (inFront.getX() - xpos > 100) {
-                xpos += 4;
-                try {
-                	if (xpos >= bridgeXLeft & xposOld < bridgeXLeft) {sem.acquire(); controller.enterLeft();}
-                    else if (xpos > bridgeXLeft && xpos < bridgeXMid) {if (ypos > bridgeY) ypos -= 2;}
-                    else if (xpos >= bridgeXRight2 && xpos < bridgeXRight) {if (ypos < initY[REDCAR]) ypos += 2;}
-                    else if (xpos >= bridgeXRight &&  xposOld < bridgeXRight) {controller.leaveRight(); sem.release();}
+                xpos += 4; 
+            	if (xpos >= bridgeXLeft & xposOld < bridgeXLeft) { controller.enterLeft();}
+                else if (xpos > bridgeXLeft && xpos < bridgeXMid) {if (ypos > bridgeY) ypos -= 2;}
+                else if (xpos >= bridgeXRight2 && xpos < bridgeXRight) {if (ypos < initY[REDCAR]) ypos += 2;}
+                else if (xpos >= bridgeXRight &&  xposOld < bridgeXRight) {controller.leaveRight(); }
                 	
-                }
-                catch (InterruptedException ie) {
-                    System.err.println( ie.toString());
-                    }
+                
             }
 	} else {
             if (xpos-inFront.getX() > 100) {
                 xpos -= 4;
-                try {
-                	if (xpos <= bridgeXRight && xposOld > bridgeXRight) {sem.acquire(); controller.enterRight();}
-                    else if (xpos < bridgeXRight && xpos > bridgeXMid) {if (ypos < bridgeY) ypos += 2;}
-                    else if (xpos <= bridgeXLeft2 && xpos > bridgeXLeft) {if(ypos > initY[BLUECAR]) ypos -= 2;}
-                    else if (xpos <= bridgeXLeft && xposOld > bridgeXLeft) {controller.leaveLeft(); sem.release();}
+            	if (xpos <= bridgeXRight && xposOld > bridgeXRight) {controller.enterRight();}
+                else if (xpos < bridgeXRight && xpos > bridgeXMid) {if (ypos < bridgeY) ypos += 2;}
+                else if (xpos <= bridgeXLeft2 && xpos > bridgeXLeft) {if(ypos > initY[BLUECAR]) ypos -= 2;}
+                else if (xpos <= bridgeXLeft && xposOld > bridgeXLeft) {controller.leaveLeft(); }
                 	
-                }
-                catch (InterruptedException ie) {
-                    System.err.println( ie.toString());
-                    }
+                
+            
             }
-            notify();
 	}
     }
 
